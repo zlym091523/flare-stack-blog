@@ -1,0 +1,361 @@
+---
+import Icon from "../components/misc/Icon.astro";
+import IconifyLoader from "../components/misc/IconifyLoader.astro";
+import { siteConfig } from "../config";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { carouselImages, gameData, reflectionText } from "../data/skills";
+
+if (!siteConfig.featurePages.skills) {
+    return Astro.redirect("/404/");
+}
+
+// 修复：提供默认语言值
+const lang = Astro.props.lang || "zh";
+const title = i18n(I18nKey.skills, lang);
+const subtitle = i18n(I18nKey.skillsSubtitle, lang);
+---
+
+<MainGridLayout title={title} description={subtitle}>
+    <script is:inline>
+        document.documentElement.setAttribute('data-page-type', 'skills');
+    </script>
+
+    <script>
+        import("../scripts//right-sidebar-layout.js");
+    </script>
+
+    <script is:inline>
+        let currentSlide = 0;
+        let autoSlideInterval;
+        
+        function initCarousel() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            if (slides.length === 0) return;
+            
+            updateCarousel();
+            startAutoSlide();
+
+            const carousel = document.querySelector('.carousel-container');
+            if (carousel) {
+                carousel.addEventListener('wheel', function (e) {
+                    e.preventDefault();
+                    if (e.deltaY < 0) prevSlide();
+                    else nextSlide();
+                    resetAutoSlide();
+                }, { passive: false });
+
+                carousel.addEventListener('mouseenter', pauseAutoSlide);
+                carousel.addEventListener('mouseleave', startAutoSlide);
+            }
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                    resetAutoSlide();
+                } else if (e.key === 'ArrowRight') {
+                    nextSlide();
+                    resetAutoSlide();
+                }
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) pauseAutoSlide();
+                else startAutoSlide();
+            });
+        }
+
+        function startAutoSlide() {
+            if (autoSlideInterval) clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(() => {
+                nextSlide();
+            }, 3000);
+        }
+
+        function pauseAutoSlide() {
+            if (autoSlideInterval) clearInterval(autoSlideInterval);
+        }
+
+        function resetAutoSlide() {
+            pauseAutoSlide();
+            startAutoSlide();
+        }
+
+        function nextSlide() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            if (slides.length === 0) return;
+            
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateCarousel();
+        }
+
+        function prevSlide() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            if (slides.length === 0) return;
+            
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateCarousel();
+        }
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            if (slides.length === 0) return;
+            
+            currentSlide = index;
+            updateCarousel();
+            resetAutoSlide();
+        }
+
+        function updateCarousel() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const dots = document.querySelectorAll('.carousel-dot');
+            
+            if (slides.length === 0 || dots.length === 0) return;
+            
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
+            });
+
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index === currentSlide) dot.classList.add('active');
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initCarousel, 100);
+        });
+    </script>
+
+    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-50">
+        <div class="card-base z-10 px-9 py-6 relative w-full">
+            <div class="flex flex-col items-start justify-center mb-8">
+                <h1 class="text-4xl font-bold text-black/90 dark:text-white/90 mb-2 relative
+                          before:w-1 before:h-8 before:rounded-md before:bg-[var(--primary)]
+                          before:absolute before:top-1/2 before:-translate-y-1/2 before:-left-4">
+                    {title}
+                </h1>
+                <p class="text-lg text-black/60 dark:text-white/60">
+                    {subtitle}
+                </p>
+            </div>
+
+            <!-- 轮播图部分 -->
+            <div class="mb-8">
+                 <div class="carousel-container bg-transparent rounded-xl overflow-hidden relative h-64">
+                    <div class="carousel-track">
+                        {carouselImages.map((image, index) => (
+                            <div class={`carousel-slide ${index === 0 ? 'active' : ''}`}>
+                                <img
+                                    src={image.placeholder || `https://picsum.photos/800/400?random=${index + 1}`}
+                                    alt={image.alt}
+                                    class="w-full h-64 object-cover"
+                                    onerror="this.onerror=null; this.src='https://picsum.photos/800/400';"
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                        {carouselImages.map((_, index) => (
+                            <button
+                                class={`carousel-dot w-2 h-2 rounded-full ${index === 0 ? 'active bg-white' : 'bg-white/50'}`}
+                                onclick={`goToSlide(${index})`}
+                            ></button>
+                        ))}
+                    </div>
+
+                    <button
+                        class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300 hover:scale-110"
+                        onclick="prevSlide()"
+                    >
+                        &lt;
+                    </button>
+                    <button
+                        class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300 hover:scale-110"
+                        onclick="nextSlide()"
+                    >
+                        &gt;
+                    </button>
+                </div>
+            </div>
+
+            <!-- 游戏信息区块 - 网格布局 -->
+            <div class="game-container grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {gameData.map((game) => (
+                    <div class="game-item bg-transparent rounded-lg border border-black/10 dark:border-white/10 p-5 transition-all duration-300 hover:shadow-lg hover:border-[var(--primary)]">
+                        <!-- 第一行：图标+游戏名+时长 -->
+                        <div class="flex items-center mb-3">
+                            <!-- 游戏图标 -->
+                            <div class="game-icon mr-3 flex-shrink-0">
+                                <a href={game.url} target="_blank" class="block relative group">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden border border-black/10 dark:border-white/10 transition-transform duration-300 group-hover:scale-105 group-hover:shadow-md">
+                                        <img
+                                            src={game.imageUrl}
+                                            alt={game.name}
+                                            class="w-full h-full object-cover"
+                                            onerror="this.onerror=null; this.src='https://via.placeholder.com/80'"
+                                        />
+                                    </div>
+                                </a>
+                            </div>
+                            
+                            <!-- 游戏名称和时长 -->
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-xl font-bold text-black/90 dark:text-white/90 truncate">
+                                    {game.name}
+                                </h3>
+                                <p class="text-sm text-black/70 dark:text-white/70 truncate">
+                                    游玩时间: {game.playTime}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 第二行：标签 -->
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            {game.tags.map((tag) => (
+                                <span class="text-xs px-2 py-1 bg-black/5 dark:bg-white/10 rounded-md">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+
+                        <!-- 第三行：星级 -->
+                        <div class="flex items-center mb-3">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <span class={`text-lg ${i < game.rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}>
+                                    ★
+                                </span>
+                            ))}
+                            <span class="text-sm ml-2 text-black/70 dark:text-white/70">
+                                {game.rating}/5
+                            </span>
+                        </div>
+
+                        <!-- 第四行：游戏简介 -->
+                        <p class="text-black/70 dark:text-white/70 mb-3 text-sm line-clamp-2">
+                            {game.description}
+                        </p>
+
+                        <!-- 第五行：公司+公测时间 -->
+                        <div class="flex justify-between text-xs text-black/60 dark:text-white/60 border-t border-black/10 dark:border-white/10 pt-2">
+                            <span>{game.company}</span>
+                            <span>公测: {game.releaseDate}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <!-- 感悟文本区块 -->
+            <div class="wenben">
+                <div class="bg-transparent rounded-lg border border-black/10 dark:border-white/10 p-6">
+                    <h2 class="text-2xl font-bold text-black/90 dark:text-white/90 mb-6 relative
+                              before:w-1 before:h-6 before:rounded-md before:bg-[var(--primary)]
+                              before:absolute before:top-1/2 before:-translate-y-1/2 before:-left-4">
+                        闲游-所悟
+                    </h2>
+                    <div class="text-suowu text-black/80 dark:text-white/80 text-center text-2xl font-bold">
+                        {reflectionText}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</MainGridLayout>
+
+<style>
+    /* 轮播图样式 */
+    .carousel-track {
+        position: relative;
+        height: 256px; /* h-64 对应的高度 */
+    }
+    .carousel-slide {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    .carousel-slide.active {
+        display: block;
+    }
+    .carousel-container {
+        cursor: grab;
+        position: relative;
+    }
+    .carousel-container:active {
+        cursor: grabbing;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0.5; }
+        to { opacity: 1; }
+    }
+
+    .carousel-dot {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .carousel-dot.active {
+        background-color: white;
+        transform: scale(1.2);
+    }
+
+    .carousel-container button {
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        z-index: 10;
+    }
+    
+   /* 游戏区块样式 */
+    .game-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    }
+    
+    .game-item:first-child{
+    background-color: #f9f0ff;
+    }
+    .game-item:nth-child(2){
+      background-color: #e3f9fd;
+    }
+    .game-item:nth-child(3){
+      background-color: #f3f9f1;
+    }
+    .game-item:nth-child(4){
+      background-color: #e8f6bf;
+    }
+    .game-item:nth-child(5){
+      background-color:#f1efba ;
+    }
+    .game-item:hover {
+    transform: translateY(-2px) scale(1.05); /* 同时应用 translateY 和 scale 效果 */
+    }
+
+
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+        .game-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .text-suowu {
+        font-family: "宋体", serif;
+        color: #e74c3c;
+        padding: 1rem;
+        background-color: #f9fafb;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .wenben {
+        margin-bottom: 25px;
+    }
+</style>

@@ -1,0 +1,123 @@
+---
+import { timelineData } from "../data/timeline";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+
+const title = "LES LOVE";
+const subtitle = "她的眼里都是她";
+---
+
+<MainGridLayout title={title} description={subtitle}>
+  <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+    <div class="card-base z-10 px-6 py-8 md:px-9 md:py-10 relative w-full">
+      <!-- 页面标题 -->
+      <div class="flex flex-col items-start justify-center mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-black/90 dark:text-white/90 mb-3 relative
+                  before:w-1 before:h-8 before:rounded-md before:bg-[var(--primary)]
+                  before:absolute before:top-1/2 before:-translate-y-1/2 before:-left-4">
+          {title}
+        </h1>
+        <p class="text-base md:text-lg text-black/60 dark:text-white/60">
+          {subtitle}
+        </p>
+      </div>
+
+      <!-- 表格区域 -->
+      <br class="overflow-x-auto">
+        <table class="min-w-full bg-transparent border border-black/10 dark:border-white/10 rounded-lg">
+          <thead>
+            <tr class="bg-black/5 dark:bg-white/5">
+              <th class="px-4 py-3 text-left text-sm font-semibold text-black/90 dark:text-white/90 border-r border-black/10 dark:border-white/10">LES-DATE</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-black/90 dark:text-white/90 border-r border-black/10 dark:border-white/10">LES-LOGO</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-black/90 dark:text-white/90 border-r border-black/10 dark:border-white/10">LES-NAME/ACTOR</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-black/90 dark:text-white/90 border-r border-black/10 dark:border-white/10">LES-LJ1</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-black/90 dark:text-white/90 border-r border-black/10 dark:border-white/10">LES-LJ2</th>
+              <th class="px-4 py-3 text-left text-sm font-semibold text-black/90 dark:text-white/90">BEIZHU</th>
+            </tr>
+          </thead>
+          <tbody>
+            {timelineData.map((item) => (
+              <tr class="border-t border-black/10 dark:border-white/10 hover:bg-black/2 dark:hover:bg-white/2">
+                <td class="px-4 py-3 text-sm text-black/70 dark:text-white/70 border-r border-black/10 dark:border-white/10">{item.startDate}</td>
+                <td class="px-4 py-3 text-sm text-black/70 dark:text-white/70 border-r border-black/10 dark:border-white/10">
+                  <div class="w-20 h-20 bg-black/5 dark:bg-white/5 rounded-lg flex items-center justify-center text-xs text-black/40 dark:text-white/40">
+                    {item.logoUrl ? <img src={item.logoUrl} alt="logo" class="w-full h-full object-cover rounded-lg" /> : "LOGO"}
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-black/70 dark:text-white/70 border-r border-black/10 dark:border-white/10">
+                  <div class="font-medium" set:html={item.title}></div>
+                </td>
+                <td class="px-4 py-3 text-sm text-black/70 dark:text-white/70 border-r border-black/10 dark:border-white/10">
+                  {item.lj1 && <a href={item.lj1} target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">理理<br>备胎</a>}
+                </td>
+                <td class="px-4 py-3 text-sm text-black/70 dark:text-white/70 border-r border-black/10 dark:border-white/10">
+                  {item.lj2 && <a href={item.lj2} target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">啾啾<br>原配</a>}
+                </td>
+                <td class="px-4 py-3 text-sm text-black/70 dark:text-white/70">
+                  <div class="text-xs">{item.description}</div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+    <!-- 密码提示 -->
+        <br class="mt-8 p-6 bg-black/5 dark:bg-white/5 rounded-lg border border-black/10 dark:border-white/10">
+            <h1 class="text-xl font-semibold mb-3">✨友情提示✨</h1>
+            <br class="prose dark:prose-invert" style="white-space: nowrap;">
+              <span class="mima">提取码：不是[**0723**]</br>
+              如“备胎”行不通，请找“原配”--（防止和谐）。</br>
+              资源来源于网络，仅供学习交流，请勿用于商业用途。</br>
+              LW-全部两季已完结|YW-全部一季已完结|L-两季未完结|Y-一季未完结|LYW-全部两季已完结一季。
+              </span>
+            </div>
+        </div>
+
+          </div>
+    </div>
+  </div>
+</MainGridLayout>
+
+<style>
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    text-align: center;
+    border-color: #839DF5;
+  }
+
+  table tr,
+  table td {
+    border-color: #839DF5;
+  }
+
+  table th:first-child,
+  table td:first-child {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+  }
+  
+  table th:last-child,
+  table td:last-child {
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    border-right: none;
+  }
+  
+  table tr:last-child td:first-child {
+    border-bottom-left-radius: 0.5rem;
+  }
+  
+  table tr:last-child td:last-child {
+    border-bottom-right-radius: 0.5rem;
+  }
+
+  .no-wrap {
+  white-space: nowrap;
+}
+  .mima {
+    font-size: 1rem;
+    color: #839DF5;
+    line-height: 1.5;
+  }
+
+</style>
